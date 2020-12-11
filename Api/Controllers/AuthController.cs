@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Api.Config;
 using Api.Constants;
 using Api.Models;
 using Api.Services;
