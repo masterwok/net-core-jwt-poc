@@ -29,8 +29,9 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish Api/Api.csproj -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/api' 
-        # Deploy to Azure Web apps
+      run: |
+        cd Api
+        dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/api' 
     - name: Deploy to Azure
       uses: azure/webapps-deploy@v2
       with:
