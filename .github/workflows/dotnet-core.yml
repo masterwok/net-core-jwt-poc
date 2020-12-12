@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Deploy to Azure
-      uses: azure/webapps-deploy@v1
+      uses: azure/webapps-deploy@v2
       with: 
         app-name: jwt-poc-demo
         publish-profile: ${{ secrets.azureWebAppPublishProfile }}   
