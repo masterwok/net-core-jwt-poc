@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Api.Config;
 using Api.Constants;
 using Api.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,8 +26,13 @@ namespace Api.Services
 
         private readonly SigningCredentials _singingCredentials;
 
-        public AuthenticationService(IOptions<ApiConfig> appSettings)
+        public AuthenticationService(
+            IOptions<ApiConfig> appSettings,
+            ILogger<AuthenticationService> logger
+        )
         {
+            logger.LogInformation(appSettings.Value?.Secret ?? "Was null womp");
+
             _singingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.Value.Secret))
                 , SecurityAlgorithms.HmacSha256Signature
