@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Api
 {
@@ -29,7 +33,22 @@ namespace Api
         {
             services.AddControllers();
 
-            services.Configure<ApiConfig>(Configuration.GetSection("Config"));
+            var jwtConfigurationSection = Configuration.GetSection("Jwt");
+            var jwtConfig = jwtConfigurationSection.Get<JwtConfig>();
+
+            services.Configure<JwtConfig>(jwtConfigurationSection);
+
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = jwtConfig.Issuer,
+                        ValidAudience = jwtConfig.Audience,
+                        IssuerSigningKey = jwtConfig.SecurityKey
+                    };
+                });
 
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
         }
@@ -46,6 +65,7 @@ namespace Api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

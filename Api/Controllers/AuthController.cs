@@ -38,6 +38,6 @@ namespace Api.Controllers
 
         [HttpPost]
         [HttpPost("refresh")]
-        public IActionResult Refresh() => throw new NotImplementedException();
+        public IActionResult Refresh() => Ok("Hey there!");
     }
 }

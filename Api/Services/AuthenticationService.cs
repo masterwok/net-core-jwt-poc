@@ -1,12 +1,10 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Api.Config;
 using Api.Constants;
 using Api.Models;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,16 +23,14 @@ namespace Api.Services
         };
 
         private readonly SigningCredentials _singingCredentials;
+        private readonly JwtConfig _jwtConfig;
 
-        public AuthenticationService(
-            IOptions<ApiConfig> appSettings,
-            ILogger<AuthenticationService> logger
-        )
+        public AuthenticationService(IOptions<JwtConfig> jwtConfig)
         {
-            logger.LogInformation(appSettings.Value?.Secret ?? "Was null womp");
+            _jwtConfig = jwtConfig.Value;
 
             _singingCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.Value.Secret))
+                _jwtConfig.SecurityKey
                 , SecurityAlgorithms.HmacSha256Signature
             );
         }
@@ -61,6 +57,8 @@ namespace Api.Services
                 {
                     new Claim("id", user.Id.ToString())
                 }),
+                Issuer = _jwtConfig.Issuer,
+                Audience = _jwtConfig.Audience,
                 Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = _singingCredentials
             };
